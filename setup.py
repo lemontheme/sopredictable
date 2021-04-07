@@ -25,7 +25,7 @@ def setup_pkg():
     setup(
         name="sopredictable",
         version=version,
-        author="lemontheme",
+        author="Adriaan Lemmens (lemontheme)",
         author_email="lemontheme@gmail.com",
         url="https://github.com/lemontheme/sopredictable",
         package_dir={"": "src"},
