@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import sys
 import zipfile
+import sys
 import json
 import functools as ft
 import shutil
@@ -11,15 +11,18 @@ from typing import (
     Any,
     Dict,
     Optional,
-    Protocol,
     Sequence,
     Tuple,
     Type,
     TypeVar,
-    TypedDict,
     Union,
     runtime_checkable,
 )
+
+if sys.version_info >= (3, 8):
+    from typing import Protocol, TypedDict
+else:
+    from typing_extensions import Protocol, TypedDict
 
 
 PREDICTOR_CLS_FILE = "predictor_cls.pkl"
@@ -31,13 +34,14 @@ ARTIFACT_DATA_DIR = "data"
 ARTIFACT_CLS_FILE = "cls.pkl"
 DEFAULT_ARTIFACT_FILE = "artifact.pkl"
 DOCKERFILE_FILE = "dockerfile"
+PICKLING_PROTOCOL = 4  # compatible with py37
 
 
 @ft.singledispatch
 def save_artifact(artifact: Any, data_dir: Path) -> None:
     try:
         (data_dir / DEFAULT_ARTIFACT_FILE).write_bytes(
-            pickle.dumps(artifact, protocol=pickle.HIGHEST_PROTOCOL)
+            pickle.dumps(artifact, protocol=PICKLING_PROTOCOL)
         )
     except pickle.PicklingError:
         raise ValueError(f"Unable to pickle artifact {artifact}")
