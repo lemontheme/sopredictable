@@ -9,7 +9,8 @@ easily in a prediction setting.
 
 ### Requirements
 
-Python 3.7 or later. All OSs and architectures are supported.
+- Python 3.7 or later.
+- All OSs and architectures are supported.
 
 ### Installation
 
@@ -19,7 +20,7 @@ pip install sopredictable
 
 ## Basic usage
 
-
+TODO
 
 
 
@@ -59,3 +60,18 @@ pip install utterlyexpected
 pip install easypretzel
 pip install usablerelic
 ```
+
+
+## License
+
+Distributed under the MIT License. See LICENSE for more information.
+
+## Acknowledgements
+
+- BentoML
+- MLFlow
+- AllenNLP
+- GCP AI Platform
+- Cortex
+
+
