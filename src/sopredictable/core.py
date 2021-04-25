@@ -96,6 +96,7 @@ def save_to_pickle(artifact: Any, data_dir: Path) -> None:
 
 
 def load_from_pickle(data_dir: Path, deps: Dict[str, Any]) -> Any:
+    print(f"loading with deps={deps}")
     _ = deps
     pickle_fpath = data_dir / DEFAULT_ARTIFACT_FILE
     try:
@@ -332,7 +333,7 @@ class Saver:
 
 # fmt: off
 @typing.overload
-def load(path: PathLike, with_info: Literal[False]) -> Predictable:
+def load(path: PathLike, with_info: Literal[False] = False) -> Predictable:
     ...
 @typing.overload
 def load(
@@ -380,7 +381,7 @@ def _save(path: Path, saver: Saver) -> None:
         (artifact_dir / ARTIFACT_LOAD_FN_FILE).write_bytes(
             pickle.dumps(artifact_record.load)
         )
-        artifact_record.save(artifact_record, artifact_dir / ARTIFACT_DATA_DIR)
+        artifact_record.save(artifact_record.value, artifact_dir / ARTIFACT_DATA_DIR)
 
     # Code
     code_path: Optional[Path] = saver._code
@@ -466,17 +467,14 @@ def _load(dir_path) -> Tuple[Predictable, _AllMeta]:
 
     meta: _AllMeta = _load_meta(dir_path)
     artifact_load_order = meta._artifact_load_order
-
     _artifact2deps: Dict[ArtifactName, List[_LoadDep]] = {
-        atfct["name"]: [
-            _LoadDep(dep["artifact_name"], dep["_load_time_name"])
-            for dep in atfct["deps"]
-        ]
+        atfct["name"]: [_LoadDep(**dep) for dep in atfct["deps"]]
         for atfct in meta._artifacts
     }
+    artifacts_dir = dir_path / ARTIFACTS_DIR
     artifacts_dict = {}
     for artifact_name in artifact_load_order:
-        artifact_dir = dir_path / artifact_name
+        artifact_dir = artifacts_dir / artifact_name
         load_fn = pickle.loads((artifact_dir / ARTIFACT_LOAD_FN_FILE).read_bytes())
         deps_arg = {
             dep.load_time_name: artifacts_dict[dep.artifact_name]

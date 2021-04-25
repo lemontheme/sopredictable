@@ -1,11 +1,13 @@
 from pathlib import Path
 from dataclasses import dataclass
+import json
 from typing import Any, Dict, Sequence
 
 from sopredictable import Saver, load, alias
 
 
 class Model:
+
     def __call__(self, x: int) -> int:
         return x * 10
 
@@ -14,46 +16,54 @@ class Model:
 class Predictor:
 
     model: Model
+    model_cfg: Any
 
     def predict(self, batch: Sequence[Dict[str, int]]) -> Sequence[Dict[str, int]]:
         return [{"y": self.model(x["feature"])} for x in batch]
 
     @classmethod
     def from_artifacts_dict(cls, artifacts_dict):
+        print(artifacts_dict)
         return cls(**artifacts_dict)
 
 
-def save_model(artifact: Model, data_dir: Path) -> None:
-    ...
+# def save_model(artifact: Model, data_dir: Path) -> None:
+#     ...
 
 
-def load_model(data_dir: Path, deps: Dict[str, Any]) -> Model:
-    ...
+# def load_model(data_dir: Path, deps: Dict[str, Any]) -> Model:
+#     ...
 
 
 def save_as_json(artifact: dict, data_dir: Path) -> None:
-    ...
+    (data_dir / "artifact.json").write_text(json.dumps(artifact))
 
 
-def load_from_json(data_dir: Path, deps) -> dict:
-    ...
+def load_from_json(data_dir: Path, deps: dict) -> dict:
+    return json.loads((data_dir / "artifact.json").read_text())
 
 
 if __name__ == "__main__":
 
-    model = Model()
     model_cfg: dict = {"layers": 2, "emb_size": 256}
+    model = Model()
 
     saver = (
         Saver(Predictor, code="", env_id="hm-ml-v1.1")  # noqa
         .set_info("hparams", {"lr": 0.01})
         .set_info("metrics", {"accuracy": 0.94})
-        .add_artifact("model", model, save_model, load_model, deps=[alias("cfg", "model_cfg")])
+        .add_artifact("model", model, deps=[alias("cfg", "model_cfg")])
         .add_artifact("model_cfg", model_cfg, save_as_json, load_from_json)
     )
 
-    saver.savet("out/exp1")
-        
+    dir_path = "out/exp1"
+    
+    saver.save(dir_path)
+
+    load(dir_path)
+
+
+
 # .add_info("dataset", {"source": "google.com"})
 # .add_tags("simple", "cnn", "nlp", "binary-clf")
 # .add_info("extra", {"annotator": {"name": "me"}})
