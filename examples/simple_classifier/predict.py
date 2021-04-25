@@ -52,7 +52,7 @@ if __name__ == "__main__":
         .add_artifact("model_cfg", model_cfg, save_as_json, load_from_json)
     )
 
-    saver.save("out/exp1")
+    saver.savet("out/exp1")
         
 # .add_info("dataset", {"source": "google.com"})
 # .add_tags("simple", "cnn", "nlp", "binary-clf")
