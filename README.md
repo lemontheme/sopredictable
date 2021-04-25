@@ -39,16 +39,57 @@ abstractions in AllenNLP, GCP AI platform, cortex, bentoml and mlflow.
 .
 |-- {user-specified directory}/
     |-- meta.json
-    |-- conda.yml   # optional
-    |-- dockerfile  # optional
-    |-- {code_path}.zip  # optional
+    |-- conda.yml   # optional. env setup is user's responsibility
+    |-- dockerfile  # optional. env setup is user's responsibility
+    |-- {code_path}.zip  # optional (appended to PYTHONPATH when loaded)
     |-- artifacts/
         |-- {user-specified artifact name}/  # e.g. 'sklearn_pipeline'
-            |-- cls.pkl  # pickled output of type(model_a)
+            |-- cls.pkl  # pickled output of `type(model_a)`
+            |-- saveload.pkl # (optional) pickled tuple `(save_fn, load_fn)`
             |-- data/  # the path provided to `{save,load}_artifact()` functions.
                 |-- artifact.pkl  # actual state of model, e.g. parameters
         |-- ...
 ```
+
+Inside meta.json:
+
+```
+{
+    "metrics": {"accuracy": 0.89},
+    "hparams": {"lr": 0.02, "initial_dropout": 0.5},
+    "dataset": {"source": "disaster-tweets"},
+    "tags": ["multilabel", "cnn"],
+    "_created_at": "2021-02-21T23:21:02.412Z",
+    "_sopredictable_version": "0.1.0",
+    "_python_version": "3.9.2",
+    "_os": "macOS",
+    "_artifacts": [
+        "model": {"cls": ..., "save": ..., "load": ..., "deps": ...}
+    ]
+}
+```
+
+or (better):
+
+```json
+{
+    "_model": {
+        "metrics": {"accuracy": 0.89},
+        "hparams": {"lr": 0.02, "initial_dropout": 0.5},
+        "dataset": {"source": "disaster-tweets"},
+        "tags": ["multilabel", "cnn"],
+    },
+    "_created_at": "2021-02-21T23:21:02.412Z",
+    "_sopredictable_version": "0.1.0",
+    "_python_version": "3.9.2",
+    "_os": "macOS",
+    "_artifacts": [
+        "model": {"cls": ..., "save": ..., "load": ..., "deps": ...}
+    ]
+}
+```
+
+
 
 ### Adding custom artifact persistence logic
 

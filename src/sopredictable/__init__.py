@@ -1,11 +1,15 @@
 from sopredictable.core import (
-    save,
+    Saver,
     load,
-    load_with_meta,
-    ModelMeta,
     Predictable,
-    save_artifact,
-    load_artifact
+    alias
 )
 
 from sopredictable.about import __version__
+
+__all__ = [
+    "Saver",
+    # "load",
+    # "load_with_meta",
+    "Predictable",
+]
