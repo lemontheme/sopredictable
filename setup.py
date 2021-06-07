@@ -9,8 +9,11 @@ install_requires = [
     "typing-extensions;python_version < '3.8'",
 ]
 
-extras_require = {"dev": ["pytest"]}
-    
+extras_require = {
+    "serve": ["fastapi"],
+    "dev": ["pytest"]
+}
+
 with ABOUT_MODULE.open("r") as f:
     mod_globals = {}
     exec(f.read(), mod_globals)

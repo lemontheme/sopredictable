@@ -2,14 +2,14 @@ from pathlib import Path
 from dataclasses import dataclass
 import json
 from typing import Any, Dict, Sequence
+import sys
 
-from sopredictable import Saver, load, alias
+import sopredictable as sop
+from sopredictable.core import Saver, rename
 
+sys.path.insert(0, ".")
 
-class Model:
-
-    def __call__(self, x: int) -> int:
-        return x * 10
+from simple_classifier.model import Model
 
 
 @dataclass
@@ -19,6 +19,10 @@ class Predictor:
     model_cfg: Any
 
     def predict(self, batch: Sequence[Dict[str, int]]) -> Sequence[Dict[str, int]]:
+        """
+        Example:
+            >>> ...
+        """
         return [{"y": self.model(x["feature"])} for x in batch]
 
     @classmethod
@@ -44,28 +48,41 @@ def load_from_json(data_dir: Path, deps: dict) -> dict:
 
 
 if __name__ == "__main__":
-
     model_cfg: dict = {"layers": 2, "emb_size": 256}
     model = Model()
 
     saver = (
-        Saver(Predictor, code="", env_id="hm-ml-v1.1")  # noqa
-        .set_info("hparams", {"lr": 0.01})
-        .set_info("metrics", {"accuracy": 0.94})
-        .add_artifact("model", model, deps=[alias("cfg", "model_cfg")])
+        Saver(Predictor, code="simple_classifier")  # noqa
+        .set_env(env_id="hm-ml-v1.1")
+        .set_info(hparams={"lr": 0.01}, tags=["textcat"])
+        .add_artifact("model", model, deps=[rename("model_cfg", "cfg")])
         .add_artifact("model_cfg", model_cfg, save_as_json, load_from_json)
     )
 
+    # ...
+    # Later...
+    saver = (
+        saver.set_info(
+            hparams=sop.utils.merge(saver.info.hparams, {"dropout": 0.2}),
+            tags=sop.utils.unique(saver.info.tags, ["test"])
+        )
+    )
+
     dir_path = "out/exp1"
-    
     saver.save(dir_path)
+    # predictor, info = sop.load_with_info(dir_path)
+    # print(info)
 
-    load(dir_path)
+# saver.assign_info(hparams=)
 
-
-
+# .add_info("hparams", {"lr": 0.01})
+#         .add_info("metrics", {"accuracy": 0.94})
+#         .add_info("dataset", {"source": "google.com"})
+#         .add_info("extra", {"annotator": {"name": "me"}})
+# .add_tags("cnn", "nlp", "binary-clf")
+# .add_info("hparams", {"lr": 0.01})
+# .add_info("metrics", {"accuracy": 0.94})
 # .add_info("dataset", {"source": "google.com"})
-# .add_tags("simple", "cnn", "nlp", "binary-clf")
 # .add_info("extra", {"annotator": {"name": "me"}})
 
 # .with_code('.')
@@ -74,7 +91,7 @@ if __name__ == "__main__":
 # .with_meta(hparams={"lr": 0.01})
 # or
 
-# saver = (   
+# saver = (
 #     Saver(Predictor)
 #     .include_code(".")
 #     .include_env(dockerfile="./dockerfile")
@@ -93,7 +110,7 @@ if __name__ == "__main__":
 #     "out/dir", artifacts={"model": Model()}
 # )
 
-# or 
+# or
 
 # (
 #     saver
@@ -101,12 +118,12 @@ if __name__ == "__main__":
 #     .add_artifact("model", Model())
 #     .save("out/dir")
 # )
-# 
+#
 # .pack_artifact("model", model)
 # .pack_artifact("cfg", model_cfg)
 # # 0r
 
-# saver = (   
+# saver = (
 #     Saver(Predictor)
 #     .with_code(".")
 #     .with_env(dockerfile="./dockerfile")
@@ -263,3 +280,11 @@ if __name__ == "__main__":
 # )
 #
 # bundle.save("out/exp2")
+
+# saver = Saver(Predictor, env_id="hm-ml-v1.1")
+# saver.add_info(hparams={"lr": 0.01})
+# with saver.options(on_conflict="merge"):
+#     saver.add_info(hparams={"dropout": 0.01})
+# saver.add_artifact("model", model, deps=[alias("cfg", "model_cfg")])
+# saver.add_artifact("model_cfg", model_cfg, save_as_json, load_from_json)
+# saver.save("out/dir")

@@ -1,15 +1,20 @@
 from sopredictable.core import (
-    Saver,
+    rename,
     load,
+    load_with_info,
     Predictable,
-    alias
+    Saver,
 )
 
-from sopredictable.about import __version__
+from sopredictable.about import __version__  # noqa
+from sopredictable import utils
+
 
 __all__ = [
     "Saver",
-    # "load",
-    # "load_with_meta",
+    "load",
+    "load_with_info",
     "Predictable",
+    "rename",
+    "utils"
 ]
