@@ -1,9 +1,10 @@
-# sopredictable
+Work in progress. Don't use. 
+
+# sopredictable [WIP]
 
 *sopredictable* ('so predictable') lets you save the results of machine learning training 
 runs  in such a way that they can be loaded
 easily in a prediction setting.
-
 
 ## Getting Started
 
@@ -15,7 +16,7 @@ easily in a prediction setting.
 ### Installation
 
 ```
-pip install sopredictable
+# pip install sopredictable
 ```
 
 ## Basic usage
